@@ -13,7 +13,6 @@ use My::pcapReader qw(interpret_global_header interpret_packet_header);
 use My::StackWalk qw(stackwalk);
 use My::Protocols qw(ethernet);
 
-$|=1;
 my $gh=pack("LSSlLLL",0xa1b2c3d4,2,4,0,0,65535,1);
 my $errbuf;
 my $pack_num=0;
@@ -32,14 +31,15 @@ sub main {
 }
 
 sub process_packet {
+    $|=1;
     $pack_num++;
     my ($user, $header, $packet)=@_;
     &stuff_packet($header,$packet);
     print "I've read $pack_num packets...\r";
-    if ($pack_num % 1000 == 0) {
-        #@tmp_packets=splice @packets,0,1000;
-        @tmp_packets=@packets;
-        @packets=();
+    if ($pack_num % 2000 == 0) {
+        @tmp_packets=splice @packets,0,2000;
+        #@tmp_packets=@packets;
+        #@packets=();
         my $pid = fork;
         if ($pid == 0) {
             &write_packets;
